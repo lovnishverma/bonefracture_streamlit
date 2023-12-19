@@ -66,9 +66,9 @@ def predict_braintumor(img_path):
     confidence = pred[0][0]
 
     if confidence >= 0.5:
-        prediction = "Brain Tumor Found!"
-    else:
         prediction = "Brain Tumor Not Found!"
+    else:
+        prediction = "Brain Tumor Found!"
 
     return prediction
 
