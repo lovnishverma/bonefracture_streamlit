@@ -84,22 +84,30 @@ def preprocess_image(file_path):
 
 # Function to make a prediction
 def predict_braintumor(img_path):
-    img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    try:
+        img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 
-    # Crop and preprocess the grayscale image
-    img_processed = crop_imgs([img_gray])
-    img_processed = preprocess_imgs(img_processed, (224, 224))
+        if img_gray is None or img_gray.size == 0:
+            raise ValueError("Error reading or processing the uploaded image.")
 
-    # Make prediction
-    pred = braintumor_model.predict(img_processed)
+        # Crop and preprocess the grayscale image
+        img_processed = crop_imgs([img_gray])
+        img_processed = preprocess_imgs(img_processed, (224, 224))
 
-    # Handle binary decision
-    confidence = pred[0][0]
+        # Make prediction
+        pred = braintumor_model.predict(img_processed)
 
-    if confidence >= 0.5:
-        return "Brain Tumor Not Found!"
-    else:
-        return "Brain Tumor Found!"
+        # Handle binary decision
+        confidence = pred[0][0]
+
+        if confidence >= 0.5:
+            return "Brain Tumor Not Found!"
+        else:
+            return "Brain Tumor Found!"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
 
 # Main function for the app
 def main():
