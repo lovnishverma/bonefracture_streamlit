@@ -66,9 +66,9 @@ def predict_braintumor(img_path):
     confidence = pred[0][0]
 
     if confidence >= 0.5:
-        prediction = "Brain Tumor Not Found!"
-    else:
         prediction = "Brain Tumor Found!"
+    else:
+        prediction = "Brain Tumor Not Found!"
 
     return prediction
 
@@ -82,12 +82,14 @@ def main():
 
     if enable_examples:
         # Examples for users to choose from
-        example_images = ['examples/1 yes.jpg', 'examples/1 no.jpg', 'examples/2 yes.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/3 yes.jpg']
+        example_images = ['examples/Y1.jpg', 'examples/1 no.jpg', 'examples/Y2.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/Y3.jpg']
 
         # Display example images horizontally
         example_col = st.columns(len(example_images))
         for example in example_images:
-            example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True, on_click=lambda e=example: st.write(predict_braintumor(e)))
+            button_col, image_col = st.columns(2)
+            button_col.button("", on_click=lambda e=example: st.write(predict_braintumor(e)), key=example)
+            image_col.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
