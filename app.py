@@ -13,7 +13,6 @@ braintumor_model = load_model('brain_tumor_binary.h5')
 # Configuring Streamlit
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-st.set_option('deprecation.showfileUploaderEncoding', False)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
