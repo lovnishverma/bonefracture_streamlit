@@ -88,7 +88,7 @@ def predict_braintumor(img_path):
         img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
 
         if img_gray is None or img_gray.size == 0:
-            raise ValueError("Error reading or processing the uploaded image.")
+            raise ValueError(f"Error reading or processing the uploaded image. Image: {img_path}")
 
         # Crop and preprocess the grayscale image
         img_processed = crop_imgs([img_gray])
@@ -107,7 +107,6 @@ def predict_braintumor(img_path):
 
     except Exception as e:
         return f"Error: {str(e)}"
-
 
 # Main function for the app
 def main():
@@ -131,7 +130,17 @@ def main():
     st.write("## Example Images")
     example_col = st.columns(len(example_images))
     for example in example_images:
-        example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
+        if st.button("", key=f"example_{example_images.index(example)}"):
+            st.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
+            st.write("")
+
+            # Classify the selected example image
+            st.write("## Classifying...")
+            result = predict_braintumor(example)
+
+            # Display prediction
+            st.subheader("Prediction:")
+            st.success(result)
 
     st.write("")
 
@@ -143,23 +152,6 @@ def main():
         # Classify the uploaded image
         st.write("## Classifying...")
         result = predict_braintumor(uploaded_file.name)
-
-        # Display prediction
-        st.subheader("Prediction:")
-        st.success(result)
-
-    st.write("")
-
-    # Display selected example image and prediction
-    clicked_example = st.selectbox("Choose an example for prediction:", example_images)
-    if clicked_example is not None:
-        st.write("## Selected Example Image")
-        st.image(clicked_example, caption=f"Example: {os.path.basename(clicked_example)}", use_column_width=True)
-        st.write("")
-
-        # Classify the selected example image
-        st.write("## Classifying...")
-        result = predict_braintumor(clicked_example)
 
         # Display prediction
         st.subheader("Prediction:")
