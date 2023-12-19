@@ -75,26 +75,19 @@ def predict_braintumor(img_path):
 def main():
     st.title("Brain Tumor Prediction App")
 
-    # Checkbox to enable examples (default is True)
+    uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+
+    # Checkbox to enable examples
     enable_examples = st.checkbox("Enable Examples", value=True)
 
     if enable_examples:
-        # Examples for users to choose from
-        examples = ['examples/Y1.jpg', 'examples/1 no.jpeg', 'examples/Y2.jpg', 'examples/2 no.jpeg', 'examples/3 no.jpeg', 'examples/Y3.jpg']
+        examples_folder = 'examples'
+        example_images = [os.path.join(examples_folder, img) for img in os.listdir(examples_folder) if img.endswith(('.png', '.jpg', '.jpeg'))]
 
-        # Display small clickable images
-        for example in examples:
-            img = cv2.imread(example)
-            st.image(img, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
-
-        # Use the first example by default
-        example_choice = st.selectbox("Choose an Example", examples, index=0)
-
-        # Use the chosen example
-        uploaded_file = open(example_choice, 'rb')
-    else:
-        # File uploader for user's own images
-        uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+        st.subheader("Example Images:")
+        for example in example_images:
+            img_example = cv2.imread(example)
+            st.image(img_example, caption=os.path.basename(example), width=100)
 
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
