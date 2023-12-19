@@ -73,8 +73,6 @@ def predict_braintumor(img_path):
 def main():
     st.title("Brain Tumor Prediction App")
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
-
     # Display example images horizontally
     example_images = [
         'examples/1 no.jpeg',
@@ -87,28 +85,17 @@ def main():
 
     example_col = st.columns(len(example_images))
     for example in example_images:
-        if st.button("", key=f"example_{example_images.index(example)}"):
-            st.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
-            st.subheader("Prediction for Example Image:")
-            st.success(predict_braintumor(example))
+        example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
-    if uploaded_file is not None:
-        st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
+    clicked_example = st.selectbox("Choose an example for prediction:", example_images)
+
+    if clicked_example is not None:
+        st.image(clicked_example, caption=f"Selected Example: {os.path.basename(clicked_example)}", use_column_width=True)
         st.write("")
         st.write("Classifying...")
 
-        # Read the contents of the uploaded file
-        file_contents = uploaded_file.read()
-
-        # Save the uploaded file
-        filename = secure_filename(uploaded_file.name)
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-
-        with open(file_path, "wb") as f:
-            f.write(file_contents)
-
-        # Make prediction
-        result = predict_braintumor(file_path)
+        # Make prediction for the clicked example
+        result = predict_braintumor(clicked_example)
 
         # Display prediction
         st.subheader("Prediction:")
