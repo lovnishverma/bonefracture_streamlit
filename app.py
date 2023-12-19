@@ -66,28 +66,28 @@ def predict_braintumor(img_path):
     confidence = pred[0][0]
 
     if confidence >= 0.5:
-        return "Brain Tumor Found!"
+        prediction = "Brain Tumor Found!"
     else:
-        return "Brain Tumor Not Found!"
+        prediction = "Brain Tumor Not Found!"
+
+    return prediction
 
 def main():
     st.title("Brain Tumor Prediction App")
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    # Display example images horizontally
-    example_images = [
-        'examples/1 no.jpeg',
-        'examples/2 no.jpeg',
-        'examples/3 no.jpg',
-        'examples/Y1.jpg',
-        'examples/Y2.jpg',
-        'examples/Y3.jpg'
-    ]
+    # Checkbox to enable examples
+    enable_examples = st.checkbox("Enable Examples", value=True)
 
-    example_col = st.columns(len(example_images))
-    for example in example_images:
-        example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
+    if enable_examples:
+        # Examples for users to choose from
+        example_images = ['examples/1 yes.jpg', 'examples/1 no.jpg', 'examples/2 yes.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/3 yes.jpg']
+
+        # Display example images horizontally
+        example_col = st.columns(len(example_images))
+        for example in example_images:
+            example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True, on_click=lambda e=example: st.write(predict_braintumor(e)))
 
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
@@ -107,7 +107,7 @@ def main():
         # Make prediction
         result = predict_braintumor(file_path)
 
-        # Display prediction
+        # Display prediction and confidence
         st.subheader("Prediction:")
         st.success(result)
 
