@@ -77,6 +77,17 @@ def main():
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
+    # Checkbox to enable examples
+    enable_examples = st.checkbox("Enable Examples", value=False)
+
+    if enable_examples:
+        # Examples for users to choose from
+        examples = ['examples/Y1.jpg', 'examples/1 no.jpg', 'examples/Y2.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/Y3.jpg']
+        example_choice = st.selectbox("Choose an Example", examples)
+
+        # Use the chosen example
+        uploaded_file = open(example_choice, 'rb')
+
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
         st.write("")
