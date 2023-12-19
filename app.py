@@ -66,26 +66,29 @@ def predict_braintumor(img_path):
     confidence = pred[0][0]
 
     if confidence >= 0.5:
-        prediction = "Brain Tumor Found!"
+        return "Brain Tumor Found!"
     else:
-        prediction = "Brain Tumor Not Found!"
-
-    return prediction
+        return "Brain Tumor Not Found!"
 
 def main():
     st.title("Brain Tumor Prediction App")
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    # Example images
-    example_images = ['1 no.jpeg', '2 no.jpeg', '3 no.jpg', 'Y1.jpg', 'Y2.jpg', 'Y3.jpg']
-
     # Display example images horizontally
+    example_images = [
+        'examples/1 no.jpeg',
+        'examples/2 no.jpeg',
+        'examples/3 no.jpg',
+        'examples/Y1.jpg',
+        'examples/Y2.jpg',
+        'examples/Y3.jpg'
+    ]
+
     example_col = st.columns(len(example_images))
     for example in example_images:
         example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
-    # When an example image is clicked, show the prediction
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
         st.write("")
@@ -104,7 +107,7 @@ def main():
         # Make prediction
         result = predict_braintumor(file_path)
 
-        # Display prediction and confidence
+        # Display prediction
         st.subheader("Prediction:")
         st.success(result)
 
