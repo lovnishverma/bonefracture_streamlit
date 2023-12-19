@@ -37,6 +37,26 @@ st.markdown(
             color: {text_color};
             background-color: {background_color};
         }}
+        .sidebar .sidebar-content {{
+            background-color: {primary_color};
+            color: {text_color};
+        }}
+        .sidebar .sidebar-content .stButton {{
+            background-color: {secondary_color};
+            color: {text_color};
+        }}
+        .sidebar .sidebar-content .stFileUploader {{
+            color: {text_color};
+        }}
+        .main .block-container {{
+            max-width: 1000px;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }}
+        .main .element-container img {{
+            max-width: 100%;
+            height: auto;
+        }}
     </style>
     """,
     unsafe_allow_html=True
