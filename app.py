@@ -54,12 +54,23 @@ def preprocess_image(file_path):
 
 def predict_braintumor(img_path):
     img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+
+    # Crop and preprocess the grayscale image
     img_processed = crop_imgs([img_gray])
     img_processed = preprocess_imgs(img_processed, (224, 224))
+
+    # Make prediction
     pred = braintumor_model.predict(img_processed)
 
     # Handle binary decision
-    return pred[0][0]  # Return confidence score
+    confidence = pred[0][0]
+
+    if confidence >= 0.5:
+        print("Brain Tumor Found!")
+        return "Brain Tumor Found!"
+    else:
+        print("Brain Tumor Not Found!")
+        return "Brain Tumor Not Found!"
 
 def main():
     st.title("Brain Tumor Prediction App")
@@ -82,16 +93,11 @@ def main():
             f.write(file_contents)
 
         # Make prediction
-        confidence = predict_braintumor(file_path)
+        result = predict_braintumor(file_path)
 
         # Display prediction and confidence
         st.subheader("Prediction:")
-        result = "Positive" if confidence >= 0.5 else "Negative"
         st.success(result)
-
-        st.subheader("Confidence:")
-        confidence_percentage = f"{confidence * 100:.2f}%"
-        st.success(confidence_percentage)
 
 if __name__ == "__main__":
     main()
