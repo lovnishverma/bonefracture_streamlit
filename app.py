@@ -83,7 +83,7 @@ def main():
         # Make prediction
         result = predict_braintumor(file_path)
 
-        st.success(f"Prediction: {'Positive' if result == 1 else 'Negative'}")
+        st.success(f"Prediction: {'Negative' if result == 1 else 'Positive'}")
 
 
 if __name__ == "__main__":
