@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 import os
 
 # Load the brain tumor prediction model
-braintumor_model = load_model('brain_tumor_binary.h5')
+braintumor_model = load_model('models/brain_tumor_binary.h5')
 
 # Configuring Streamlit
 UPLOAD_FOLDER = 'static/uploads'
