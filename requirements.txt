@@ -5,4 +5,3 @@ tensorflow
 scikit-learn
 requests
 pandas
-pickle
