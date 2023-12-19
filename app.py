@@ -70,15 +70,21 @@ def main():
         st.write("")
         st.write("Classifying...")
 
+        # Read the contents of the uploaded file
+        file_contents = uploaded_file.read()
+
         # Save the uploaded file
         filename = secure_filename(uploaded_file.name)
         file_path = os.path.join(UPLOAD_FOLDER, filename)
-        uploaded_file.save(file_path)
+
+        with open(file_path, "wb") as f:
+            f.write(file_contents)
 
         # Make prediction
         result = predict_braintumor(file_path)
 
         st.success(f"Prediction: {'Positive' if result == 1 else 'Negative'}")
+
 
 if __name__ == "__main__":
     main()
