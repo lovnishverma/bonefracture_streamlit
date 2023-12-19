@@ -70,6 +70,17 @@ def predict_braintumor(img_path):
     else:
         return "Brain Tumor Found!"
 
+def display_prediction_for_example(example_path):
+    st.write("")
+    st.write("Classifying example image...")
+
+    # Make prediction for the example image
+    example_result = predict_braintumor(example_path)
+
+    # Display prediction for the example image
+    st.subheader("Prediction for Example Image:")
+    st.success(example_result)
+
 def main():
     st.title("Brain Tumor Prediction App")
 
@@ -87,6 +98,9 @@ def main():
 
     example_col = st.columns(len(example_images))
     for example in example_images:
+        # Add interaction to example images
+        if st.button(f"Example: {os.path.basename(example)}"):
+            display_prediction_for_example(example)
         example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
     if uploaded_file is not None:
