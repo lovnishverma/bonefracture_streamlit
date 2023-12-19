@@ -7,10 +7,10 @@ from tensorflow.keras.preprocessing import image
 import pickle
 
 # Loading Models
-braintumor_model = load_model('models/brain_tumor_binary.h5')
+braintumor_model = load_model('brain_tumor_binary.h5')
 
 # Load the trained model
-diabetes_model = pickle.load(open('models/diabetes.sav', 'rb'))
+diabetes_model = pickle.load(open('diabetes.sav', 'rb'))
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
