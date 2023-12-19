@@ -70,31 +70,22 @@ def predict_braintumor(img_path):
     else:
         prediction = "Brain Tumor Not Found!"
 
-    return prediction, confidence
+    return prediction
 
 def main():
     st.title("Brain Tumor Prediction App")
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    # Examples in a horizontal line
-    examples_folder = 'examples'
-    example_images = [os.path.join(examples_folder, img) for img in os.listdir(examples_folder) if img.endswith(('.png', '.jpg', '.jpeg'))]
+    # Example images
+    example_images = ['1 no.jpeg', '2 no.jpeg', '3 no.jpg', 'Y1.jpg', 'Y2.jpg', 'Y3.jpg']
 
-    st.subheader("Example Images:")
+    # Display example images horizontally
+    example_col = st.columns(len(example_images))
     for example in example_images:
-        img_example = cv2.imread(example)
-        example_col = st.beta_columns(len(example_images))[example_images.index(example)]
-        example_col.image(img_example, caption=os.path.basename(example), width=100, use_column_width=False, key=example)
+        example_col[example_images.index(example)].image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
-        # Show prediction on click
-        if example_col.button(f"Predict for {os.path.basename(example)}"):
-            prediction, confidence = predict_braintumor(example)
-            st.subheader(f"Prediction for {os.path.basename(example)}:")
-            st.success(prediction)
-            st.subheader("Confidence:")
-            st.success(f"{confidence * 100:.2f}%")
-
+    # When an example image is clicked, show the prediction
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
         st.write("")
@@ -111,14 +102,11 @@ def main():
             f.write(file_contents)
 
         # Make prediction
-        result, confidence = predict_braintumor(file_path)
+        result = predict_braintumor(file_path)
 
         # Display prediction and confidence
         st.subheader("Prediction:")
         st.success(result)
-
-        st.subheader("Confidence:")
-        st.success(f"{confidence * 100:.2f}%")
 
 if __name__ == "__main__":
     main()
