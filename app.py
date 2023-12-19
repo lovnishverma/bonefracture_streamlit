@@ -16,125 +16,78 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 st.set_page_config(
     page_title="Brain Tumor Prediction App",
     page_icon=":brain:",
-    layout="wide"
+    layout="wide"  # Make the layout wider
 )
 
-# Define colors for better styling
-primary_color = "#1f7ed0"
-secondary_color = "#2a2a2a"
-text_color = "#ffffff"
-background_color = "#f4f4f4"
-
-# Set the style for the page
+# Add custom CSS for styling
 st.markdown(
-    f"""
+    """
     <style>
-        body {{
-            color: {text_color};
-            background-color: {background_color};
-        }}
-        .reportview-container .main {{
-            color: {text_color};
-            background-color: {background_color};
-        }}
-        .sidebar .sidebar-content {{
-            background-color: {primary_color};
-            color: {text_color};
-        }}
-        .sidebar .sidebar-content .stButton {{
-            background-color: {secondary_color};
-            color: {text_color};
-        }}
-        .sidebar .sidebar-content .stFileUploader {{
-            color: {text_color};
-        }}
-        .main .block-container {{
-            max-width: 1000px;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }}
-        .main .element-container img {{
-            max-width: 100%;
-            height: auto;
-        }}
+        .main {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .title {
+            color: #4285F4;
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn {
+            border: 2px solid gray;
+            color: gray;
+            background-color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        .example-images {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .example-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .prediction {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Function to allow only specific file types
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# Function to preprocess and crop images
-def preprocess_imgs(set_name, img_size):
-    set_new = []
-    for img in set_name:
-        img = cv2.resize(img, dsize=img_size, interpolation=cv2.INTER_CUBIC)
-        set_new.append(preprocess_input(img))
-    return np.array(set_new)
-
-def crop_imgs(set_name, add_pixels_value=0):
-    set_new = []
-    for img in set_name:
-        gray = cv2.GaussianBlur(img, (5, 5), 0)
-        thresh = cv2.threshold(gray, 45, 255, cv2.THRESH_BINARY)[1]
-        thresh = cv2.erode(thresh, None, iterations=2)
-        thresh = cv2.dilate(thresh, None, iterations=2)
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-        c = max(cnts, key=cv2.contourArea)
-        extLeft = tuple(c[c[:, :, 0].argmin()][0])
-        extRight = tuple(c[c[:, :, 0].argmax()][0])
-        extTop = tuple(c[c[:, :, 1].argmin()][0])
-        extBot = tuple(c[c[:, :, 1].argmax()][0])
-        ADD_PIXELS = add_pixels_value
-        new_img = img[extTop[1] - ADD_PIXELS:extBot[1] + ADD_PIXELS,
-                      extLeft[0] - ADD_PIXELS:extRight[0] + ADD_PIXELS].copy()
-        set_new.append(new_img)
-    return np.array(set_new)
-
-# Function to preprocess an image
-def preprocess_image(file_path):
-    img = image.load_img(file_path, target_size=(200, 200))
-    img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array /= 255.0  # Normalize the image
-    return img_array
-
-# Function to make a prediction
-def predict_braintumor(img_path):
-    try:
-        img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-
-        if img_gray is None or img_gray.size == 0:
-            raise ValueError(f"Error reading or processing the uploaded image. Image: {img_path}")
-
-        # Crop and preprocess the grayscale image
-        img_processed = crop_imgs([img_gray])
-        img_processed = preprocess_imgs(img_processed, (224, 224))
-
-        # Make prediction
-        pred = braintumor_model.predict(img_processed)
-
-        # Handle binary decision
-        confidence = pred[0][0]
-
-        if confidence >= 0.5:
-            return "Brain Tumor Not Found!"
-        else:
-            return "Brain Tumor Found!"
-
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-# Main function for the app
 def main():
-    st.title("Brain Tumor Prediction App")
+    st.markdown("<div class='main'>", unsafe_allow_html=True)
+    st.markdown("<div class='title'>Brain Tumor Prediction App</div>", unsafe_allow_html=True)
 
-    # Sidebar for uploading a new image
-    st.sidebar.header("Upload New Image")
-    uploaded_file = st.sidebar.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+    uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"], key="fileuploader")
 
     # Display example images horizontally
     example_images = [
@@ -146,36 +99,35 @@ def main():
         'examples/3 yes.jpg'
     ]
 
-    # Display example images in a row
-    st.write("## Example Images")
-    example_col = st.columns(len(example_images))
+    st.markdown("<div class='example-images'>", unsafe_allow_html=True)
     for example in example_images:
-        if st.button("", key=f"example_{example_images.index(example)}"):
-            st.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
-            st.write("")
-
-            # Classify the selected example image
-            st.write("## Classifying...")
-            result = predict_braintumor(example)
-
-            # Display prediction
-            st.subheader("Prediction:")
-            st.success(result)
-
-    st.write("")
+        st.image(example, caption=f"Example: {os.path.basename(example)}", width=150, use_column_width=False, output_format='auto')
+    st.markdown("</div>", unsafe_allow_html=True)
 
     if uploaded_file is not None:
-        # Display uploaded image
-        st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
+        st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
         st.write("")
+        st.write("Classifying...")
 
-        # Classify the uploaded image
-        st.write("## Classifying...")
-        result = predict_braintumor(uploaded_file.name)
+        # Read the contents of the uploaded file
+        file_contents = uploaded_file.read()
+
+        # Save the uploaded file
+        filename = secure_filename(uploaded_file.name)
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        with open(file_path, "wb") as f:
+            f.write(file_contents)
+
+        # Make prediction
+        result = predict_braintumor(file_path)
 
         # Display prediction
-        st.subheader("Prediction:")
+        st.markdown("<div class='prediction'>", unsafe_allow_html=True)
         st.success(result)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
