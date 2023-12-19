@@ -77,19 +77,15 @@ def main():
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    # Checkbox to enable examples
-    enable_examples = st.checkbox("Enable Examples", value=True)
+    # Examples for users to choose from
+    example_images = ['examples/1 yes.jpg', 'examples/1 no.jpg', 'examples/2 yes.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/3 yes.jpg']
 
-    if enable_examples:
-        # Examples for users to choose from
-        example_images = ['examples/Y1.jpg', 'examples/1 no.jpg', 'examples/Y2.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/Y3.jpg']
-
-        # Display example images horizontally
-        example_col = st.columns(len(example_images))
-        for example in example_images:
-            button_col, image_col = st.columns(2)
-            button_col.button("", on_click=lambda e=example: st.write(predict_braintumor(e)), key=example)
-            image_col.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
+    # Display example images horizontally
+    example_col = st.columns(len(example_images))
+    for example in example_images:
+        button_col, image_col = st.columns(2)
+        button_col.button("", on_click=lambda e=example: st.write(predict_braintumor(e)), key=example)
+        image_col.image(example, caption=f"Example: {os.path.basename(example)}", use_column_width=True)
 
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
