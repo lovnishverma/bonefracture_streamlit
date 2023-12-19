@@ -13,6 +13,7 @@ braintumor_model = load_model('brain_tumor_binary.h5')
 # Configuring Streamlit
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+st.set_page_config(page_title="Brain Tumor Prediction App", page_icon=":brain:")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -58,7 +59,7 @@ def predict_braintumor(img_path):
     pred = braintumor_model.predict(img_processed)
 
     # Handle binary decision
-    return 1 if pred[0] >= 0.5 else 0
+    return pred[0][0]  # Return confidence score
 
 def main():
     st.title("Brain Tumor Prediction App")
@@ -81,10 +82,16 @@ def main():
             f.write(file_contents)
 
         # Make prediction
-        result = predict_braintumor(file_path)
+        confidence = predict_braintumor(file_path)
 
-        st.success(f"Prediction: {'Negative' if result == 1 else 'Positive'}")
+        # Display prediction and confidence
+        st.subheader("Prediction:")
+        result = "Positive" if confidence >= 0.5 else "Negative"
+        st.success(result)
 
+        st.subheader("Confidence:")
+        confidence_percentage = f"{confidence * 100:.2f}%"
+        st.success(confidence_percentage)
 
 if __name__ == "__main__":
     main()
