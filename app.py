@@ -80,7 +80,7 @@ def main():
 
     if enable_examples:
         # Examples for users to choose from
-        examples = ['examples/Y1.jpg', 'examples/1 no.jpg', 'examples/Y2.jpg', 'examples/2 no.jpg', 'examples/3 no.jpg', 'examples/Y3.jpg']
+        examples = ['examples/Y1.jpg', 'examples/1 no.jpeg', 'examples/Y2.jpg', 'examples/2 no.jpeg', 'examples/3 no.jpeg', 'examples/Y3.jpg']
 
         # Display small clickable images
         for example in examples:
