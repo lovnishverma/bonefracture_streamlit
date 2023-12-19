@@ -77,17 +77,14 @@ def main():
 
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    # Checkbox to enable examples
-    enable_examples = st.checkbox("Enable Examples", value=True)
+    # Examples in a horizontal list
+    examples_folder = 'examples'
+    example_images = [os.path.join(examples_folder, img) for img in os.listdir(examples_folder) if img.endswith(('.png', '.jpg', '.jpeg'))]
 
-    if enable_examples:
-        examples_folder = 'examples'
-        example_images = [os.path.join(examples_folder, img) for img in os.listdir(examples_folder) if img.endswith(('.png', '.jpg', '.jpeg'))]
-
-        st.subheader("Example Images:")
-        for example in example_images:
-            img_example = cv2.imread(example)
-            st.image(img_example, caption=os.path.basename(example), width=100)
+    st.subheader("Example Images:")
+    for example in example_images:
+        img_example = cv2.imread(example)
+        st.image(img_example, caption=os.path.basename(example), width=100, use_column_width=False)
 
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image.", use_column_width=True)
