@@ -1,71 +1,56 @@
 import streamlit as st
-import numpy as np
-from PIL import Image
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+import os
+from werkzeug.utils import secure_filename
 import cv2
+import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+
+# Load the trained model
+model = load_model("Bone_fracture_classifier_model.h5")
+
+# Function to check if the file extension is allowed
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png'}
 
 # Function to preprocess the image
-def preprocess_image(img_path):
-    img = image.load_img(img_path, target_size=(200, 200))
+def preprocess_image(file_path):
+    img = image.load_img(file_path, target_size=(200, 200))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array /= 255.0  # Normalize the image
     return img_array
 
-# Function to preprocess a set of images
-def preprocess_images(img_set):
-    processed_set = []
-    for img_path in img_set:
-        processed_set.append(preprocess_image(img_path))
-    return np.vstack(processed_set)
+def main():
+    st.title("Bone Fracture Detection App")
 
-# Function to predict brain tumor probability
-def predict_tumor_probability(model, img_set):
-    processed_set = preprocess_images(img_set)
-    return model.predict(processed_set)
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-# Sidebar
-st.sidebar.title("Brain Tumor Detection App")
+    if uploaded_file is not None:
+        # Check if the file extension is allowed
+        if allowed_file(uploaded_file.name):
+            # Display the selected image
+            st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
 
-# Upload images
-st.sidebar.header("Upload Images")
-uploaded_files = st.sidebar.file_uploader("Choose images...", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+            # Save the uploaded image temporarily
+            temp_image_path = "temp_image.jpg"
+            with open(temp_image_path, "wb") as temp_image:
+                temp_image.write(uploaded_file.read())
 
-# Example images
-example_images = [
-    'examples/1 no.jpeg',
-    'examples/2 no.jpeg',
-    'examples/3 no.jpg',
-    'examples/1 yes.jpg',
-    'examples/2 yes.jpg',
-    'examples/3 yes.jpg'
-]
+            # Preprocess the image
+            img_array = preprocess_image(temp_image_path)
 
-# Display examples
-st.sidebar.header("Example Images")
-selected_examples = st.sidebar.multiselect("Select example images:", example_images)
+            # Make prediction
+            prediction = model.predict(img_array)[0, 0]
+            result = "Broken" if prediction > 0.5 else "Not Broken"
 
-# Combine uploaded and selected examples
-selected_images = uploaded_files or selected_examples
+            st.write(f"Prediction: {result}")
+            st.write(f"Confidence: {prediction:.2%}")
 
-if selected_images:
-    st.sidebar.header("Selected Images")
-    st.sidebar.image(selected_images, width=100)
+            # Remove the temporary image file
+            os.remove(temp_image_path)
+        else:
+            st.warning("Invalid file format. Please upload an image with a valid format (jpg, jpeg, or png).")
 
-    # Predict tumor probability
-    st.header("Brain Tumor Detection Results")
-    st.subheader("Uploaded and Selected Images")
-
-    # Load the model
-    braintumor_model = load_model('models/brain_tumor_binary.h5')
-
-    # Display prediction results
-    probabilities = predict_tumor_probability(braintumor_model, selected_images)
-
-    for i, img_path in enumerate(selected_images):
-        st.image(img_path, caption=f"Probability: {probabilities[i][0]:.2%}", use_column_width=True)
-
-else:
-    st.warning("Please upload or select at least one image.")
-
+if __name__ == "__main__":
+    main()
